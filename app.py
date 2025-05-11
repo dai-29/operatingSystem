@@ -56,7 +56,40 @@ if st.session_state.page == "home":
     The simulator supports **FIFO** and **LRU** algorithms for page replacement, and **Round Robin** and **SJF** for CPU scheduling. By offering interactive visualization, students can enhance their understanding, experiment with scenarios, and truly grasp the underlying logic. Osync aims to bridge the gap between theory and practice, making OS concepts more approachable and engaging.
     """)
 
+    # Custom CSS for styling
+    st.markdown("""
+        <style>
+        .stButton>button {
+            font-family: "Lucida Console", "Courier New", monospace;
+            background-color: #007BFF;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            border-radius: 12px;
+            border: none;
+            padding: 12px 30px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .stButton>button:hover {
+            background-color: #0056b3;
+            font-size: 22px;
+            transform: scale(1.05);
+        }
+        .stMarkdown h2 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Title
     st.markdown("## 🚀 Explore Simulators:")
+
+    # Create columns with styled buttons
     col1, col2 = st.columns(2)
     with col1:
         if st.button("📄 Page Replacement"):
