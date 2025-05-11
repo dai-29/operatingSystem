@@ -33,5 +33,3 @@ Understanding operating system algorithms such as FIFO, LRU, Round Robin, and SJ
 
 ---
 
-## 📁 Project Structure
-
