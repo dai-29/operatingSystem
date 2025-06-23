@@ -198,6 +198,8 @@ elif st.session_state.page == "process_scheduling":
             else:
                 st.success(f"Running {sched_algo}...")
 
+                gantt_data = []
+
                 def round_robin_process_scheduling(burst_times, quantum):
                     n = len(burst_times)
                     remaining = burst_times[:]
@@ -208,8 +210,11 @@ elif st.session_state.page == "process_scheduling":
                         for i in queue:
                             if remaining[i] > 0:
                                 exec_time = min(quantum, remaining[i])
-                                result.append(f"P{i+1} ran for {exec_time} units (Remaining: {remaining[i] - exec_time})")
+                                start_time = t
                                 t += exec_time
+                                end_time = t
+                                result.append(f"P{i+1} ran for {exec_time} units (Remaining: {remaining[i] - exec_time})")
+                                gantt_data.append(("P"+str(i+1), start_time, end_time))
                                 remaining[i] -= exec_time
                     return result
 
@@ -219,6 +224,7 @@ elif st.session_state.page == "process_scheduling":
                     time = 0
                     for i, bt in sorted_processes:
                         result.append(f"P{i+1} ran from time {time} to {time + bt}")
+                        gantt_data.append(("P"+str(i+1), time, time + bt))
                         time += bt
                     return result
 
@@ -230,6 +236,33 @@ elif st.session_state.page == "process_scheduling":
                 st.info("📋 Scheduling Output:")
                 for r in result:
                     st.write(r)
+
+                # Matplotlib Gantt Chart
+                st.markdown("### 📈 Matplotlib Gantt Chart")
+                fig, ax = plt.subplots(figsize=(10, 2 + num_processes))
+                for i, (pname, start, end) in enumerate(gantt_data):
+                    ax.broken_barh([(start, end - start)], (i * 10, 9), facecolors=('tab:blue'))
+                    ax.text(start + (end - start) / 2, i * 10 + 4.5, pname, 
+                            ha='center', va='center', color='white', fontsize=10, fontweight='bold')
+                ax.set_yticks([i * 10 + 4.5 for i in range(len(gantt_data))])
+                ax.set_yticklabels([p[0] for p in gantt_data])
+                ax.set_xlabel("Time")
+                ax.set_title(f"{sched_algo} Scheduling Timeline")
+                st.pyplot(fig)
+
+                # Plotly Gantt Chart
+                st.markdown("### 📊 Plotly Scheduling Timeline")
+                fig2 = go.Figure()
+                for pname, start, end in gantt_data:
+                    fig2.add_trace(go.Scatter(
+                        x=[start, end],
+                        y=[pname, pname],
+                        mode='lines+markers',
+                        line=dict(width=20),
+                        name=pname
+                    ))
+                fig2.update_layout(title=f"{sched_algo} Gantt Timeline", xaxis_title="Time", yaxis_title="Process")
+                st.plotly_chart(fig2)
 
         except ValueError:
             st.error("Invalid burst times input. Please ensure the input is comma-separated integers.")
